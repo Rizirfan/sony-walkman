@@ -68,7 +68,7 @@ This application is ready for free deployment on **Render**.
 
 1.  Connect your GitHub repository to Render.
 2.  Create a new **Web Service** with:
-    *   **Root Directory**: `Downloads/shdesignmeld projects/projects/open/sony walkman` (or leave blank if files are at your repo root)
+    *   **Root Directory**: Leave blank (since files are at the repository root)
     *   **Build Command**: `npm install`
     *   **Start Command**: `node server.js`
 3.  Add a **Persistent Disk** (under **Disks**) mounted at path `/data` (size: `1 GB`) to persist user account data across updates.
