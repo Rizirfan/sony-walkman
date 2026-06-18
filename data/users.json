@@ -1,0 +1,57 @@
+{
+  "mdirfan": {
+    "username": "mdirfan",
+    "hash": "7e2bdc6c222c72ec35ff772ec2135ca0335d45b07f5d29df318f832a61a2e396dc4285f7d12da44cd18c501f65ace90440b395fe145bac649f149691f91b1f3a",
+    "salt": "7421f2622b687c212859b1ac360d5cd8",
+    "playlist": [
+      {
+        "id": "spddHZypPTc",
+        "title": "இசைஞானியின் இரவு கானங்கள் - Volume 1 | Isaignani Ilaiyaraaja | Tamil Hits | Night Melody Songs",
+        "channel": "Ilaiyaraaja Official",
+        "thumbnail": "https://i.ytimg.com/vi/spddHZypPTc/default.jpg"
+      },
+      {
+        "id": "ujwD1rSgCyo",
+        "title": "Harris Jayaraj - Birthday Special | Vaseegara | June Ponal | Venmathiye | Unnaale Unnaale |",
+        "channel": "Saregama Carvaan Tamil",
+        "thumbnail": "https://i.ytimg.com/vi/ujwD1rSgCyo/default.jpg"
+      },
+      {
+        "id": "jiJRh5MrGiE",
+        "title": "Melody Hits of Rahman - Jukebox | Pachchai Nirame | Enna Solla Pogirai | Kaattrae En Vaasal",
+        "channel": "Saregama Tamil",
+        "thumbnail": "https://i.ytimg.com/vi/jiJRh5MrGiE/default.jpg"
+      },
+      {
+        "id": "oIB91eFGpYE",
+        "title": "Deva Hits Collection | Best Audio Melodies &amp; Romantic Songs",
+        "channel": "Abi KFC",
+        "thumbnail": "https://i.ytimg.com/vi/oIB91eFGpYE/default.jpg"
+      },
+      {
+        "id": "XIlVccT7cqI",
+        "title": "Vidyasagar Melodies | Evergreen Tamil Love Songs | வித்யாசாகர் பாடல்கள்| RagaDeepam",
+        "channel": "RagaDeepam",
+        "thumbnail": "https://i.ytimg.com/vi/XIlVccT7cqI/default.jpg"
+      },
+      {
+        "id": "yYSImw6-rvc",
+        "title": "D.இமான் இசையில் - காதல் பாடல்கள்",
+        "channel": "Mr Uraj",
+        "thumbnail": "https://i.ytimg.com/vi/yYSImw6-rvc/default.jpg"
+      },
+      {
+        "id": "hE1MH7XlF6I",
+        "title": "Hip Hop Tamizha - JukeBox - Movie Hits - Tamil Hits - Hip Hop Tamizha Songs- Tamil Songs",
+        "channel": "music master",
+        "thumbnail": "https://i.ytimg.com/vi/hE1MH7XlF6I/default.jpg"
+      }
+    ],
+    "settings": {
+      "theme": "theme-dark",
+      "apiKey": "AIzaSyAN9I3PrQW9wY7QQt5gHZ7Bu-FTUooE_MY",
+      "sfx": true
+    },
+    "createdAt": "2026-06-18T09:28:41.207Z"
+  }
+}

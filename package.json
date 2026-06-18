@@ -1,0 +1,11 @@
+{
+  "name": "sony-walkman-youtube-player",
+  "version": "1.0.0",
+  "description": "Retro Sony Walkman Player using YouTube API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Antigravity",
+  "license": "ISC"
+}

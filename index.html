@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Sony Ericsson Walkman 4.0 - Glassmorphic Edition</title>
+  <!-- Google Fonts for Orbitron (digital LCD), Montserrat (modern UI), and Reenie Beanie (cassette handwriting) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&family=Reenie+Beanie&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-dark">
+  <!-- Dynamic Ambient Background Glows -->
+  <div class="ambient-glow-container">
+    <div class="glow-orb orb-1" id="orb-1"></div>
+    <div class="glow-orb orb-2" id="orb-2"></div>
+    <div class="glow-orb orb-3" id="orb-3"></div>
+  </div>
+
+  <!-- Custom Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <div class="app-wrapper">
+    <!-- Header with Walkman branding -->
+    <header class="app-header">
+      <div class="header-logo">
+        <svg class="w-logo" viewBox="0 0 100 100" width="30" height="30">
+          <!-- Stylized Walkman 'W' Logo -->
+          <path d="M10,80 L35,20 L50,55 L65,20 L90,80 L75,80 L65,55 L50,85 L35,55 L25,80 Z" fill="currentColor" />
+          <circle cx="50" cy="18" r="8" fill="currentColor" />
+        </svg>
+        <span>WALKMAN <span class="version-tag">v4.0</span></span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-toggle-settings" class="glass-btn icon-btn" title="Settings">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-layout view-player">
+      <!-- Left side: YouTube Search & Quick Playlist (Glassmorphic panels) -->
+      <section class="side-panel left-panel" id="search-panel">
+        <div class="panel-header">
+          <h2>YouTube Library</h2>
+          <button class="close-panel-btn" id="btn-close-search">&times;</button>
+        </div>
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="Search songs or paste URL..." autocomplete="off">
+          <button id="search-btn" class="glass-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="search-results-container custom-scrollbar">
+          <div id="search-results-list" class="songs-list">
+            <!-- Search items loaded dynamically -->
+            <div class="list-placeholder">Search for your favorite tracks or load the default retro mix.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Center: The Walkman Device itself -->
+      <section class="player-container">
+        <div class="walkman-device" id="walkman-body">
+          <!-- Metallic accent lines and borders -->
+          <div class="walkman-glass-bevel"></div>
+          
+          <!-- WALKMAN branding logo top -->
+          <div class="device-brand">
+            <div class="w-logo-container">
+              <svg class="w-logo-accent" viewBox="0 0 100 100">
+                <path d="M10,80 L35,20 L50,55 L65,20 L90,80 L75,80 L65,55 L50,85 L35,55 L25,80 Z" fill="currentColor" />
+                <circle cx="50" cy="18" r="8" fill="currentColor" />
+              </svg>
+            </div>
+            <span class="brand-text">SONY</span>
+          </div>
+
+          <!-- LCD / Digital Screen (Sony Ericsson UI style) -->
+          <div class="digital-lcd">
+            <div class="lcd-header">
+              <span class="lcd-status" id="lcd-status-text">STOPPED</span>
+              <span class="lcd-eq-mode">MEGA BASS</span>
+            </div>
+            <div class="lcd-track-title">
+              <div class="scroll-wrapper">
+                <div class="scroll-text" id="lcd-title">Load a Cassette Tape</div>
+              </div>
+            </div>
+            <div class="lcd-footer">
+              <div class="lcd-time" id="lcd-time-display">00:00 / 00:00</div>
+              <!-- Simulated Graphic Equalizer Bars -->
+              <div class="lcd-equalizer" id="equalizer-bars">
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cassette Compartment -->
+          <div class="cassette-deck" id="cassette-deck-door">
+            <!-- Cassette Tape Mockup inside -->
+            <div class="cassette-tape" id="cassette-tape-body">
+              <div class="cassette-shell">
+                <!-- Cassette window label (Handwriting text) -->
+                <div class="cassette-label">
+                  <div class="label-heading">
+                    <span class="side-marker">A</span>
+                    <span class="brand-name">WALKMAN 90</span>
+                  </div>
+                  <div class="label-writein" id="cassette-writein-title">RETRO SYNTHWAVE MIX</div>
+                </div>
+
+                <!-- Spinning Reels and Transparent window -->
+                <div class="cassette-window">
+                  <div class="reel reel-left" id="reel-left">
+                    <svg class="reel-svg" viewBox="0 0 100 100">
+                      <!-- Tape winding (scales down) -->
+                      <circle class="tape-winding" id="tape-winding-left" cx="50" cy="50" r="38" fill="#36251c" />
+                      <!-- Cassette Center Core -->
+                      <circle cx="50" cy="50" r="15" fill="#fff" stroke="#999" stroke-width="2" />
+                      <!-- Gear teeth/spokes -->
+                      <g class="reel-spokes">
+                        <rect x="47" y="28" width="6" height="44" rx="2" fill="#222" />
+                        <rect x="28" y="47" width="44" height="6" rx="2" fill="#222" transform="rotate(45 50 50)" />
+                        <rect x="28" y="47" width="44" height="6" rx="2" fill="#222" transform="rotate(-45 50 50)" />
+                        <rect x="28" y="47" width="44" height="6" rx="2" fill="#222" />
+                      </g>
+                      <!-- Center axle hole -->
+                      <circle cx="50" cy="50" r="6" fill="#111" />
+                    </svg>
+                  </div>
+                  <div class="reel reel-right" id="reel-right">
+                    <svg class="reel-svg" viewBox="0 0 100 100">
+                      <!-- Tape winding (scales up) -->
+                      <circle class="tape-winding" id="tape-winding-right" cx="50" cy="50" r="22" fill="#36251c" />
+                      <!-- Cassette Center Core -->
+                      <circle cx="50" cy="50" r="15" fill="#fff" stroke="#999" stroke-width="2" />
+                      <!-- Gear teeth/spokes -->
+                      <g class="reel-spokes">
+                        <rect x="47" y="28" width="6" height="44" rx="2" fill="#222" />
+                        <rect x="28" y="47" width="44" height="6" rx="2" fill="#222" transform="rotate(45 50 50)" />
+                        <rect x="28" y="47" width="44" height="6" rx="2" fill="#222" transform="rotate(-45 50 50)" />
+                        <rect x="28" y="47" width="44" height="6" rx="2" fill="#222" />
+                      </g>
+                      <!-- Center axle hole -->
+                      <circle cx="50" cy="50" r="6" fill="#111" />
+                    </svg>
+                  </div>
+                </div>
+                
+                <!-- Cassette bottom details (screws, trap tape) -->
+                <div class="cassette-footer">
+                  <div class="screw screw-tl"></div>
+                  <div class="screw screw-tr"></div>
+                  <div class="screw screw-bl"></div>
+                  <div class="screw screw-br"></div>
+                  <div class="trapezoid-window"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Frosted Glass Cover overlay with Walkman markings -->
+            <div class="cassette-glass-cover">
+              <div class="glass-reflection"></div>
+              <div class="glass-text">DYNAMIC SOUND SYSTEM</div>
+            </div>
+          </div>
+
+
+
+          <!-- Jog-Dial & Control Buttons (Sony Ericsson W995/Walkman style) -->
+          <div class="jog-dial-panel">
+            <div class="circular-jog-dial">
+              <!-- Rewind (Left) -->
+              <button id="btn-rew" class="jog-btn rew" title="Rewind / Previous">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <polygon points="11,19 2,12 11,5" />
+                  <polygon points="22,19 13,12 22,5" />
+                </svg>
+              </button>
+              
+              <!-- Play/Pause (Center circle) -->
+              <button id="btn-play-pause" class="jog-center-btn" title="Play / Pause">
+                <!-- Play Icon -->
+                <svg id="play-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21" />
+                </svg>
+                <!-- Pause Icon (hidden by default) -->
+                <svg id="pause-icon" class="hidden" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" />
+                  <rect x="14" y="4" width="4" height="16" />
+                </svg>
+              </button>
+
+              <!-- Fast Forward (Right) -->
+              <button id="btn-ff" class="jog-btn ff" title="Fast Forward / Next">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <polygon points="13,19 22,12 13,5" />
+                  <polygon points="2,19 11,12 2,5" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Rectangular Mechanical secondary controls below the dial -->
+            <div class="mechanical-buttons">
+              <button id="btn-stop" class="mech-btn stop" title="Stop">
+                <div class="mech-btn-top"></div>
+                <span>STOP</span>
+              </button>
+              <button id="btn-eject" class="mech-btn eject" title="Eject Tape">
+                <div class="mech-btn-top"></div>
+                <span>EJECT</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right side: Custom Playlist (Glassmorphic panels) -->
+      <section class="side-panel right-panel" id="playlist-panel">
+        <div class="panel-header">
+          <h2>My Cassette Playlist</h2>
+          <button class="close-panel-btn" id="btn-close-playlist">&times;</button>
+        </div>
+        <div class="playlist-controls">
+          <button id="btn-clear-playlist" class="glass-btn text-btn">Clear All</button>
+          <button id="btn-load-retro" class="glass-btn text-btn accent-text">Reset to Retro Mix</button>
+        </div>
+        <div class="playlist-container custom-scrollbar">
+          <div id="playlist-songs-list" class="songs-list">
+            <!-- Playlist items loaded dynamically -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Floating UI triggers for Mobile / Tablets -->
+    <div class="mobile-nav-bar">
+      <button id="btn-mobile-player" class="mobile-nav-btn active-btn">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="3" />
+          <circle cx="8" cy="12" r="2" />
+          <circle cx="16" cy="12" r="2" />
+          <line x1="6" y1="8" x2="18" y2="8" />
+        </svg>
+        <span>Player</span>
+      </button>
+      <button id="btn-mobile-search" class="mobile-nav-btn">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>Search</span>
+      </button>
+      <button id="btn-mobile-playlist" class="mobile-nav-btn">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        <span>Playlist</span>
+      </button>
+    </div>
+
+    <!-- Hidden YouTube API Video Player -->
+    <div id="yt-player-container">
+      <div id="youtube-player"></div>
+    </div>
+
+    <!-- Glassmorphic Settings Modal -->
+    <div class="modal-backdrop hidden" id="settings-modal">
+      <div class="glass-modal">
+        <div class="modal-header">
+          <h3>Settings</h3>
+          <button id="btn-close-settings" class="close-modal-btn" title="Close">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- API Key Section -->
+          <div class="setting-item">
+            <div class="setting-meta">
+              <label for="settings-api-key">YouTube Data API Key</label>
+              <span class="setting-hint">Enables dynamic music search. Keys are stored locally on your device. <a href="https://developers.google.com/youtube/v3/getting-started" target="_blank" class="accent-link">Get Key →</a></span>
+            </div>
+            <input type="password" id="settings-api-key" placeholder="Enter API Key...">
+          </div>
+
+          <div class="setting-divider"></div>
+
+          <!-- Color Theme Picker (Row) -->
+          <div class="setting-item row-item">
+            <div class="setting-meta">
+              <label>Interface Accent</label>
+              <span class="setting-hint">Choose your neon styling colorway</span>
+            </div>
+            <div class="theme-picker">
+              <button class="theme-dot dark active" data-theme="theme-dark" title="Obsidian Black"></button>
+              <button class="theme-dot light" data-theme="theme-light" title="Arctic White"></button>
+              <button class="theme-dot red" data-theme="theme-red" title="Limited Red"></button>
+            </div>
+          </div>
+
+          <div class="setting-divider"></div>
+
+          <!-- Audio SFX Toggle (Row with Toggle Switch) -->
+          <div class="setting-item row-item">
+            <div class="setting-meta">
+              <label for="settings-sfx">Mechanical Feedback</label>
+              <span class="setting-hint">Play realistic tape-deck clicks via Web Audio</span>
+            </div>
+            <label class="ios-switch">
+              <input type="checkbox" id="settings-sfx" checked>
+              <span class="ios-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-divider"></div>
+
+          <!-- Account & Cloud Sync Section -->
+          <div id="settings-account-section">
+            <div class="setting-section-header">Account & Cloud Sync</div>
+            
+            <!-- Logged Out View -->
+            <div id="settings-auth-logged-out">
+              <div class="setting-item" style="margin-bottom: 8px;">
+                <input type="text" id="auth-username" placeholder="Username" autocomplete="username">
+              </div>
+              <div class="setting-item" style="margin-bottom: 8px;">
+                <input type="password" id="auth-password" placeholder="Password" autocomplete="current-password">
+              </div>
+              <div class="auth-error-message hidden" id="auth-error-msg"></div>
+              
+              <div class="settings-auth-actions">
+                <button id="btn-auth-submit" class="glass-btn text-btn accent-text">Sign In</button>
+                <div class="auth-toggle-hint">
+                  <span id="auth-toggle-text">New user?</span>
+                  <a href="#" id="auth-toggle-link" class="accent-link">Sign Up</a>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Logged In View -->
+            <div id="settings-auth-logged-in" class="hidden">
+              <div class="profile-info-container">
+                <div class="profile-avatar">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--accent)" stroke-width="1.5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <div class="profile-details">
+                  <div class="profile-username" id="profile-display-username">Username</div>
+                  <div class="profile-sync-status" id="profile-sync-status">Synced to cloud</div>
+                </div>
+              </div>
+              
+              <div class="settings-auth-actions">
+                <button id="btn-force-sync" class="glass-btn text-btn accent-text">Sync Now</button>
+                <button id="btn-logout" class="glass-btn text-btn">Log Out</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-save-settings" class="glass-btn save-btn">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
