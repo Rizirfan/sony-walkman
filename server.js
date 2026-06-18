@@ -136,7 +136,9 @@ const server = http.createServer((req, res) => {
 
   // Decode URL to handle spaces and special chars
   const decodedUrl = decodeURIComponent(req.url);
-  let filePath = path.join(__dirname, decodedUrl === '/' ? 'index.html' : decodedUrl);
+  // Strip query parameters (e.g. ?v=4.0) to correctly resolve static files on disk
+  const pathname = decodedUrl.split('?')[0];
+  let filePath = path.join(__dirname, pathname === '/' ? 'index.html' : pathname);
   
   // Prevent directory traversal attacks
   if (!filePath.startsWith(__dirname)) {

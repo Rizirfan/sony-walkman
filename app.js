@@ -12,6 +12,8 @@ let progressInterval = null;
 let isEjected = false;
 let isFastForwarding = false;
 let isRewinding = false;
+let isDraggingSlider = false;
+let isInsertingTape = false; // Prevents overlapping tape loads and locks deck keys
 
 // User Account & Cloud Sync State
 let currentUserToken = localStorage.getItem("walkman_user_token") || null;
@@ -603,6 +605,7 @@ function renderPlaylist() {
 
     // Click card to play
     item.addEventListener("click", (e) => {
+      if (isInsertingTape) return; // Ignore input while mechanical loading is active
       // Don't play if clicking delete button
       if (e.target.closest(".delete-btn")) return;
       playTrack(track);
@@ -610,6 +613,7 @@ function renderPlaylist() {
 
     // Delete track event
     item.querySelector(".delete-btn").addEventListener("click", (e) => {
+      if (isInsertingTape) return; // Ignore input while mechanical loading is active
       e.stopPropagation();
       deleteTrack(index);
     });
@@ -620,29 +624,75 @@ function renderPlaylist() {
 
 // --- Player Audio Actions ---
 function playTrack(track) {
-  if (isEjected) {
-    // Force close door first
-    toggleEject();
-  }
+  if (isInsertingTape) return; // Prevent concurrent insertion requests
 
+  const deck = document.getElementById("cassette-deck-door");
+  const tapeBody = document.getElementById("cassette-tape-body");
+  if (!deck || !tapeBody) return;
+
+  const hasOldTape = (currentTrack !== null);
+  
+  // Instantly highlight target song card in playlist (visual feedback)
   currentTrack = track;
   renderPlaylist();
-  
-  // Update Cassette label
-  document.getElementById("cassette-writein-title").innerText = track.title.toUpperCase();
-  document.getElementById("lcd-title").innerText = track.title;
-  document.getElementById("lcd-title").classList.add("scroll-active");
 
-  // Update Dynamic Ambient Colors
-  updateAmbientColors(track.title);
+  isInsertingTape = true;
 
-  if (ytPlayer && ytApiReady) {
-    ytPlayer.loadVideoById(track.id);
-    setPlaybackState("playing");
-  } else {
-    // Queue load for when YT ready
-    console.warn("YouTube API not fully ready. Track queued.");
-  }
+  const sequence = async () => {
+    // Stop any active seek states
+    isFastForwarding = false;
+    isRewinding = false;
+
+    // Step 1: Open door if closed
+    if (!deck.classList.contains("eject-open")) {
+      isEjected = true;
+      deck.classList.add("eject-open");
+      playMechanicalClick("eject");
+      await new Promise(r => setTimeout(r, 500)); // Wait for door swing
+    }
+
+    // Step 2: Unload old tape if one was present
+    if (hasOldTape) {
+      tapeBody.classList.add("eject-out");
+      await new Promise(r => setTimeout(r, 450));
+      tapeBody.classList.remove("eject-out");
+    }
+
+    // Step 3: Update labels (while pocket is empty)
+    document.getElementById("cassette-writein-title").innerText = track.title.toUpperCase();
+    document.getElementById("lcd-title").innerText = track.title;
+    document.getElementById("lcd-title").classList.add("scroll-active");
+    updateAmbientColors(track.title);
+
+    // Step 4: Slide new tape into the open pocket
+    tapeBody.classList.add("slide-in-load");
+    tapeBody.getBoundingClientRect(); // Force layout reflow
+    tapeBody.classList.remove("slide-in-load");
+    tapeBody.classList.add("slide-in-active");
+    await new Promise(r => setTimeout(r, 550));
+    tapeBody.classList.remove("slide-in-active");
+
+    // Step 5: Close door
+    isEjected = false;
+    deck.classList.remove("eject-open");
+    playMechanicalClick("heavy-clunk");
+    await new Promise(r => setTimeout(r, 500));
+
+    // Step 6: Begin video playback
+    if (ytPlayer && ytApiReady) {
+      ytPlayer.loadVideoById(track.id);
+      setPlaybackState("playing");
+    } else {
+      console.warn("YouTube API not fully ready. Track queued.");
+    }
+
+    isInsertingTape = false;
+  };
+
+  sequence().catch(err => {
+    console.error("Tape insert sequence failed:", err);
+    isInsertingTape = false;
+  });
 }
 
 function deleteTrack(index) {
@@ -785,9 +835,10 @@ function setPlaybackState(state) {
     pauseIcon.classList.add("hidden");
     eqBars.classList.remove("playing");
 
+    // Stop reels spinning
     document.getElementById("reel-left").classList.remove("spinning");
     document.getElementById("reel-right").classList.remove("spinning");
-    
+
     stopProgressTracker();
     updateProgressDisplay(0, 0);
   }
@@ -821,6 +872,15 @@ function updateProgressDisplay(current, duration) {
   };
 
   document.getElementById("lcd-time-display").innerText = `${formatTime(current)} / ${formatTime(duration)}`;
+
+  // Update progress slider
+  const slider = document.getElementById("lcd-progress-slider");
+  if (slider && !isDraggingSlider) {
+    slider.max = duration > 0 ? duration : 100;
+    slider.value = current;
+    const pct = duration > 0 ? (current / duration) * 100 : 0;
+    slider.style.background = `linear-gradient(to right, var(--lcd-text) ${pct}%, rgba(255, 255, 255, 0.15) ${pct}%)`;
+  }
 
   // Update cassette tape magnetic reels volume density sizes!
   if (duration > 0) {
@@ -873,6 +933,23 @@ function stopPlayback() {
     ytPlayer.stopVideo();
   }
   setPlaybackState("stopped");
+}
+
+// --- Volume Adjustment ---
+function adjustVolume(change) {
+  if (ytPlayer && ytApiReady) {
+    playMechanicalClick("button");
+    try {
+      const currentVol = ytPlayer.getVolume();
+      const newVol = Math.min(Math.max(currentVol + change, 0), 100);
+      ytPlayer.setVolume(newVol);
+      showNotification(`Volume: ${newVol}%`, "success");
+    } catch (e) {
+      console.error("Failed to adjust volume", e);
+    }
+  } else {
+    showNotification("Walkman audio not ready", "warning");
+  }
 }
 
 // --- Toggle Mechanical Eject Deck Door ---
@@ -995,33 +1072,29 @@ function adjustPlayerScale() {
   const container = document.querySelector(".player-container");
   if (!device || !container) return;
 
-  const isMobile = window.innerWidth < 1100;
+  const containerWidth = container.clientWidth;
+  const containerHeight = container.clientHeight;
 
-  if (isMobile) {
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
+  const designWidth = 350;
+  const designHeight = 570;
 
-    const designWidth = 350;
-    const designHeight = 570;
+  const scaleX = (containerWidth * 0.98) / designWidth;
+  const scaleY = (containerHeight * 0.98) / designHeight;
+  
+  let scale = Math.min(scaleX, scaleY);
+  scale = Math.min(1.0, scale);
 
-    const scaleX = (containerWidth * 0.98) / designWidth;
-    const scaleY = (containerHeight * 0.98) / designHeight;
-    
-    let scale = Math.min(scaleX, scaleY);
-    scale = Math.min(1.0, scale);
-
-    device.style.transform = `scale(${scale})`;
-    device.style.transformOrigin = "center center";
-  } else {
-    device.style.transform = "";
-    device.style.transformOrigin = "";
-  }
+  device.style.transform = `scale(${scale})`;
+  device.style.transformOrigin = "center center";
 }
 
 // --- Custom Notification System (Toast) ---
 function showNotification(message, type = "success") {
   const container = document.getElementById("toast-container");
   if (!container) return;
+
+  // Clear existing toasts first to prevent stacking and disturbing the user
+  container.innerHTML = "";
 
   const toast = document.createElement("div");
   toast.className = `toast-notification`;
@@ -1060,10 +1133,12 @@ function showNotification(message, type = "success") {
 
   // Fade out and remove after 2.8 seconds
   setTimeout(() => {
-    toast.classList.remove("show");
-    toast.addEventListener("transitionend", () => {
-      toast.remove();
-    });
+    if (toast.parentNode === container) {
+      toast.classList.remove("show");
+      toast.addEventListener("transitionend", () => {
+        toast.remove();
+      });
+    }
   }, 2800);
 }
 
@@ -1172,6 +1247,7 @@ function addTrackToPlaylist(track) {
 function setupEventListeners() {
   // Mechanical Walkman Playback Dials
   document.getElementById("btn-play-pause").addEventListener("click", () => {
+    if (isInsertingTape) return; // Lock inputs during mechanical tape insertion
     if (!currentTrack && currentPlaylist.length > 0) {
       playTrack(currentPlaylist[0]);
       return;
@@ -1188,21 +1264,35 @@ function setupEventListeners() {
     }
   });
 
+  document.getElementById("btn-vol-up").addEventListener("click", () => {
+    if (isInsertingTape) return; // Lock inputs during mechanical tape insertion
+    adjustVolume(5);
+  });
+
+  document.getElementById("btn-vol-down").addEventListener("click", () => {
+    if (isInsertingTape) return; // Lock inputs during mechanical tape insertion
+    adjustVolume(-5);
+  });
+
   document.getElementById("btn-stop").addEventListener("click", () => {
+    if (isInsertingTape) return; // Lock inputs during mechanical tape insertion
     stopPlayback();
   });
 
   document.getElementById("btn-eject").addEventListener("click", () => {
+    if (isInsertingTape) return; // Lock inputs during mechanical tape insertion
     toggleEject();
   });
 
   // Fast seek buttons hold or click
   document.getElementById("btn-ff").addEventListener("click", () => {
+    if (isInsertingTape) return; // Lock inputs during mechanical tape insertion
     if (isFastForwarding) return;
     triggerFastSeek('ff');
   });
 
   document.getElementById("btn-rew").addEventListener("click", () => {
+    if (isInsertingTape) return; // Lock inputs during mechanical tape insertion
     if (isRewinding) return;
     triggerFastSeek('rew');
   });
@@ -1349,6 +1439,35 @@ function setupEventListeners() {
       setMobileView("playlist", btnMobilePlaylist);
     });
   }
+
+  // LCD Seekable Duration Slider Events
+  const progressSlider = document.getElementById("lcd-progress-slider");
+  if (progressSlider) {
+    progressSlider.addEventListener("input", (e) => {
+      isDraggingSlider = true;
+      const val = parseFloat(e.target.value);
+      const maxVal = parseFloat(e.target.max) || 100;
+      const pct = (val / maxVal) * 100;
+      progressSlider.style.background = `linear-gradient(to right, var(--lcd-text) ${pct}%, rgba(255, 255, 255, 0.15) ${pct}%)`;
+      
+      const formatTime = (secs) => {
+        if (isNaN(secs) || secs < 0) return "00:00";
+        const m = Math.floor(secs / 60).toString().padStart(2, '0');
+        const s = Math.floor(secs % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+      };
+      document.getElementById("lcd-time-display").innerText = `${formatTime(val)} / ${formatTime(maxVal)}`;
+    });
+
+    progressSlider.addEventListener("change", (e) => {
+      if (ytPlayer && ytApiReady) {
+        const targetSeconds = parseFloat(e.target.value);
+        ytPlayer.seekTo(targetSeconds, true);
+        playMechanicalClick("button");
+      }
+      isDraggingSlider = false;
+    });
+  }
 }
 
 // --- Initialize YouTube Script Dynamically ---
@@ -1364,3 +1483,6 @@ if (!window.YT) {
     onYouTubeIframeAPIReady();
   }
 }
+
+
+

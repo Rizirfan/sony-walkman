@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Sony Ericsson Walkman 4.0 - Glassmorphic Edition</title>
+  <!-- App Icon / Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
   <!-- Google Fonts for Orbitron (digital LCD), Montserrat (modern UI), and Reenie Beanie (cassette handwriting) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +33,7 @@
           <path d="M10,80 L35,20 L50,55 L65,20 L90,80 L75,80 L65,55 L50,85 L35,55 L25,80 Z" fill="currentColor" />
           <circle cx="50" cy="18" r="8" fill="currentColor" />
         </svg>
-        <span>WALKMAN <span class="version-tag">v4.0</span></span>
+        <span>WALKMAN <span class="version-tag">SH</span></span>
       </div>
       <div class="header-actions">
         <button id="btn-toggle-settings" class="glass-btn icon-btn" title="Settings">
@@ -94,6 +97,10 @@
                 <div class="scroll-text" id="lcd-title">Load a Cassette Tape</div>
               </div>
             </div>
+            <!-- Walkman Style Progress Slider -->
+            <div class="lcd-progress-container">
+              <input type="range" id="lcd-progress-slider" min="0" max="100" value="0" step="1">
+            </div>
             <div class="lcd-footer">
               <div class="lcd-time" id="lcd-time-display">00:00 / 00:00</div>
               <!-- Simulated Graphic Equalizer Bars -->
@@ -126,10 +133,49 @@
 
                 <!-- Spinning Reels and Transparent window -->
                 <div class="cassette-window">
+                  <!-- Magnetic tape strand running between reels -->
+                  <div class="tape-strand"></div>
+
                   <div class="reel reel-left" id="reel-left">
                     <svg class="reel-svg" viewBox="0 0 100 100">
-                      <!-- Tape winding (scales down) -->
-                      <circle class="tape-winding" id="tape-winding-left" cx="50" cy="50" r="38" fill="#36251c" />
+                      <defs>
+                        <clipPath id="clip-left">
+                          <circle class="tape-winding" id="tape-winding-left" cx="50" cy="50" r="38" />
+                        </clipPath>
+                        <!-- 3D volume gradient for magnetic tape -->
+                        <radialGradient id="tape-grad-left" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+                          <stop offset="0%" stop-color="#3c2f27" />
+                          <stop offset="60%" stop-color="#251d18" />
+                          <stop offset="85%" stop-color="#18120e" />
+                          <stop offset="100%" stop-color="#0b0806" />
+                        </radialGradient>
+                        <!-- Specular highlight linear gradient for sheen reflection -->
+                        <linearGradient id="reflection-grad-left" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28" />
+                          <stop offset="35%" stop-color="#ffffff" stop-opacity="0.08" />
+                          <stop offset="70%" stop-color="#ffffff" stop-opacity="0" />
+                        </linearGradient>
+                      </defs>
+                      
+                      <!-- Clipped detailed tape roll showing rotation -->
+                      <g clip-path="url(#clip-left)">
+                        <circle cx="50" cy="50" r="50" fill="url(#tape-grad-left)" />
+                        <!-- Concentric tape wraps (high-contrast texture) -->
+                        <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="26" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="22" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="18" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <!-- Radial reflection sheens that rotate dynamically -->
+                        <line x1="50" y1="50" x2="95" y2="65" stroke="rgba(255, 255, 255, 0.18)" stroke-width="1" />
+                        <line x1="50" y1="50" x2="5" y2="35" stroke="rgba(255, 255, 255, 0.18)" stroke-width="1" />
+                        <polygon points="50,50 85,15 95,35" fill="url(#reflection-grad-left)" />
+                        <polygon points="50,50 15,85 5,65" fill="url(#reflection-grad-left)" />
+                      </g>
+                      
                       <!-- Cassette Center Core -->
                       <circle cx="50" cy="50" r="15" fill="#fff" stroke="#999" stroke-width="2" />
                       <!-- Gear teeth/spokes -->
@@ -145,8 +191,44 @@
                   </div>
                   <div class="reel reel-right" id="reel-right">
                     <svg class="reel-svg" viewBox="0 0 100 100">
-                      <!-- Tape winding (scales up) -->
-                      <circle class="tape-winding" id="tape-winding-right" cx="50" cy="50" r="22" fill="#36251c" />
+                      <defs>
+                        <clipPath id="clip-right">
+                          <circle class="tape-winding" id="tape-winding-right" cx="50" cy="50" r="22" />
+                        </clipPath>
+                        <!-- 3D volume gradient for magnetic tape -->
+                        <radialGradient id="tape-grad-right" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+                          <stop offset="0%" stop-color="#3c2f27" />
+                          <stop offset="60%" stop-color="#251d18" />
+                          <stop offset="85%" stop-color="#18120e" />
+                          <stop offset="100%" stop-color="#0b0806" />
+                        </radialGradient>
+                        <!-- Specular highlight linear gradient for sheen reflection -->
+                        <linearGradient id="reflection-grad-right" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28" />
+                          <stop offset="35%" stop-color="#ffffff" stop-opacity="0.08" />
+                          <stop offset="70%" stop-color="#ffffff" stop-opacity="0" />
+                        </linearGradient>
+                      </defs>
+                      
+                      <!-- Clipped detailed tape roll showing rotation -->
+                      <g clip-path="url(#clip-right)">
+                        <circle cx="50" cy="50" r="50" fill="url(#tape-grad-right)" />
+                        <!-- Concentric tape wraps (high-contrast texture) -->
+                        <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="26" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="22" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <circle cx="50" cy="50" r="18" fill="none" stroke="rgba(180, 150, 120, 0.12)" stroke-width="0.8" />
+                        <!-- Radial reflection sheens that rotate dynamically -->
+                        <line x1="50" y1="50" x2="95" y2="65" stroke="rgba(255, 255, 255, 0.18)" stroke-width="1" />
+                        <line x1="50" y1="50" x2="5" y2="35" stroke="rgba(255, 255, 255, 0.18)" stroke-width="1" />
+                        <polygon points="50,50 85,15 95,35" fill="url(#reflection-grad-right)" />
+                        <polygon points="50,50 15,85 5,65" fill="url(#reflection-grad-right)" />
+                      </g>
+                      
                       <!-- Cassette Center Core -->
                       <circle cx="50" cy="50" r="15" fill="#fff" stroke="#999" stroke-width="2" />
                       <!-- Gear teeth/spokes -->
@@ -176,6 +258,17 @@
             <!-- Frosted Glass Cover overlay with Walkman markings -->
             <div class="cassette-glass-cover">
               <div class="glass-reflection"></div>
+              <!-- Metallic edge panel design for realism -->
+              <div class="glass-window-border"></div>
+              <!-- Screen-printed details on glass -->
+              <div class="glass-tape-ruler">
+                <span class="ruler-tick font-tick">100</span>
+                <span class="ruler-tick">|</span>
+                <span class="ruler-tick font-tick">50</span>
+                <span class="ruler-tick">|</span>
+                <span class="ruler-tick font-tick">0</span>
+              </div>
+              <div class="glass-auto-reverse">◄ AUTO REVERSE ►</div>
               <div class="glass-text">DYNAMIC SOUND SYSTEM</div>
             </div>
           </div>
@@ -185,6 +278,14 @@
           <!-- Jog-Dial & Control Buttons (Sony Ericsson W995/Walkman style) -->
           <div class="jog-dial-panel">
             <div class="circular-jog-dial">
+              <!-- Volume Up (Top) -->
+              <button id="btn-vol-up" class="jog-btn vol-up" title="Volume Up">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+
               <!-- Rewind (Left) -->
               <button id="btn-rew" class="jog-btn rew" title="Rewind / Previous">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -211,6 +312,13 @@
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                   <polygon points="13,19 22,12 13,5" />
                   <polygon points="2,19 11,12 2,5" />
+                </svg>
+              </button>
+
+              <!-- Volume Down (Bottom) -->
+              <button id="btn-vol-down" class="jog-btn vol-down" title="Volume Down">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
               </button>
             </div>
@@ -379,6 +487,30 @@
                 <button id="btn-force-sync" class="glass-btn text-btn accent-text">Sync Now</button>
                 <button id="btn-logout" class="glass-btn text-btn">Log Out</button>
               </div>
+            </div>
+          </div>
+          <div class="setting-divider"></div>
+          <!-- Developer Credits Section -->
+          <div class="settings-developer-credits">
+            <div class="dev-info">Developed by <span class="dev-name">MD IRFAN</span></div>
+            <div class="dev-links">
+              <a href="https://github.com/Rizirfan" target="_blank" class="dev-link-btn">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                </svg>
+                GitHub
+              </a>
+              <span class="link-separator">•</span>
+              <a href="README.md" target="_blank" class="dev-link-btn">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Documentation
+              </a>
             </div>
           </div>
         </div>

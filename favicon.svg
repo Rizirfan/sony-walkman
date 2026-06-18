@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <!-- Light theme gradient (Orange/Gold/Peach) -->
+    <linearGradient id="logo-light" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff9233" />
+      <stop offset="100%" stop-color="#ff335f" />
+    </linearGradient>
+    
+    <!-- Dark theme gradient (Cyan/Blue/Purple) -->
+    <linearGradient id="logo-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" />
+      <stop offset="100%" stop-color="#7000ff" />
+    </linearGradient>
+    
+    <!-- Shadow and Glow filters -->
+    <filter id="glow-light" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <filter id="glow-dark" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <style>
+    /* Default (Light Mode) styles */
+    .bg {
+      fill: #121214;
+      stroke: #e2e8f0;
+      stroke-width: 2px;
+      transition: all 0.3s ease;
+    }
+    .logo-path {
+      fill: url(#logo-light);
+      filter: url(#glow-light);
+    }
+    
+    /* Dark Mode overrides */
+    @media (prefers-color-scheme: dark) {
+      .bg {
+        fill: #08080a;
+        stroke: #1a1a1f;
+      }
+      .logo-path {
+        fill: url(#logo-dark);
+        filter: url(#glow-dark);
+      }
+    }
+  </style>
+
+  <!-- Background Base -->
+  <rect class="bg" width="92" height="92" x="4" y="4" rx="24" />
+
+  <!-- Centered Walkman Logo -->
+  <g transform="translate(10, 12) scale(0.8)">
+    <path class="logo-path" d="M10,80 L35,20 L50,55 L65,20 L90,80 L75,80 L65,55 L50,85 L35,55 L25,80 Z" />
+    <circle class="logo-path" cx="50" cy="18" r="8" />
+  </g>
+</svg>
